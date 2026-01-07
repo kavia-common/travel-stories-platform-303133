@@ -82,7 +82,8 @@ const SignUp = () => {
     // SignUp API Call
     try {
       const response = await axiosInstance.post('/auth/register', {
-        fullName: name,
+        // Backend expects `name`, not `fullName`
+        name: name,
         email: email,
         password: password,
       });
