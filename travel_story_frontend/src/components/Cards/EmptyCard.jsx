@@ -1,15 +1,23 @@
 import React from 'react';
 
+// PUBLIC_INTERFACE
+/**
+ * EmptyCard component displays an empty state with an icon and message
+ * @param {string} imgSrc - Optional image source for the empty state
+ * @param {string} message - Message to display in the empty state
+ */
 const EmptyCard = ({ imgSrc, message }) => {
   return (
-    <div className="flex flex-col items-center justify-center mt-20">
-      <div className="w-60 h-60 flex items-center justify-center rounded-full bg-slate-100">
-         {imgSrc ? <img src={imgSrc} alt="No notes" className="w-2/3" /> : <p className="text-4xl">📝</p>}
+    <div className="empty-card-container">
+      <div className="empty-icon-wrapper">
+        {imgSrc ? (
+          <img src={imgSrc} alt="Empty state" />
+        ) : (
+          <div style={{ fontSize: '5rem' }}>📝</div>
+        )}
       </div>
 
-      <p className="w-1/2 text-sm font-medium text-slate-700 text-center leading-7 mt-5">
-        {message}
-      </p>
+      <p className="empty-message">{message}</p>
     </div>
   );
 };

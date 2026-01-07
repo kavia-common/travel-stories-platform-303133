@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { MdAdd, MdClose } from 'react-icons/md';
 
+// PUBLIC_INTERFACE
+/**
+ * TagInput component for adding and removing tags
+ * @param {Array<string>} tags - Array of current tags
+ * @param {Function} setTags - Function to update tags array
+ */
 const TagInput = ({ tags, setTags }) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -17,6 +23,7 @@ const TagInput = ({ tags, setTags }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       addNewTag();
     }
   };
@@ -28,10 +35,10 @@ const TagInput = ({ tags, setTags }) => {
   return (
     <div>
       {tags?.length > 0 && (
-        <div className="tag-input-container mb-2">
+        <div className="tag-input-container">
           {tags.map((tag, index) => (
             <span key={index} className="tag-chip">
-              # {tag}
+              {tag}
               <button onClick={() => handleRemoveTag(tag)}>
                 <MdClose />
               </button>
@@ -40,20 +47,30 @@ const TagInput = ({ tags, setTags }) => {
         </div>
       )}
 
-      <div className="flex items-center gap-4 mt-3">
+      <div className="flex items-center gap-3 mt-3">
         <input
           type="text"
           value={inputValue}
-          className="text-sm bg-transparent border px-3 py-2 rounded outline-none"
-          placeholder="Add tags"
+          className="input-box"
+          placeholder="Add a location tag..."
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
         />
         <button
-          className="w-8 h-8 flex items-center justify-center rounded border border-blue-700 hover:bg-blue-700"
+          className="btn-primary"
           onClick={addNewTag}
+          style={{
+            width: '44px',
+            height: '44px',
+            padding: '0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+          type="button"
         >
-          <MdAdd className="text-2xl text-blue-700 hover:text-white" />
+          <MdAdd className="text-2xl" />
         </button>
       </div>
     </div>
