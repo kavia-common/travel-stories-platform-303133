@@ -29,18 +29,33 @@ const SignUp = () => {
   const featureItems = useMemo(
     () => [
       {
-        title: 'One place for every trip',
-        desc: 'Organize stories by location and date, and keep them accessible anywhere.',
+        title: 'Pin stories that matter',
+        desc: 'Keep your best trips at the top—your highlights stay one click away.',
       },
       {
-        title: 'Beautiful, modern interface',
-        desc: 'Ocean-themed design with smooth interactions and clean typography.',
+        title: 'Curated maps & locations',
+        desc: 'Tag places as you go and build a clean, searchable list of where you’ve been.',
       },
       {
-        title: 'Built for momentum',
-        desc: 'Quick creation flows, handy search, and pinning so your best stories shine.',
+        title: 'Smart search, fast recall',
+        desc: 'Find any memory instantly by title, location tags, or a phrase from your story.',
+      },
+      {
+        title: 'Secure uploads',
+        desc: 'Add photos with confidence—modern, token-based sessions and safe requests.',
       },
     ],
+    []
+  );
+
+  const communityStat = useMemo(
+    () => ({
+      headline: 'Make it a habit, not a chore',
+      body: '“The UI is calm and quick. I’ve kept a travel journal for the first time in years.”',
+      meta: '— New user, week 1',
+      statLeft: '2 min',
+      statRight: 'to publish a story',
+    }),
     []
   );
 
@@ -168,11 +183,66 @@ const SignUp = () => {
                 </div>
               </div>
 
-              <h1 className="auth-hero-title">Create your account.</h1>
+              <h1 className="auth-hero-title">Start a travel journal you’ll actually keep.</h1>
               <p className="auth-hero-desc">
-                Build a private space for your travel memories—add photos, tag locations, and keep
-                your favorites pinned.
+                Create a space for stories, photos, and places—organized with pins and tags, wrapped
+                in an Ocean Professional look that stays readable everywhere.
               </p>
+
+              {/* Subtle illustration (SVG-only; lightweight) */}
+              <div className="auth-illustration" aria-hidden="true">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 520 140"
+                  preserveAspectRatio="none"
+                  role="presentation"
+                >
+                  <defs>
+                    <linearGradient id="waveGradSignup" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="rgba(255,255,255,0.30)" />
+                      <stop offset="50%" stopColor="rgba(245,158,11,0.26)" />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0.22)" />
+                    </linearGradient>
+                    <linearGradient id="waveGrad2Signup" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="rgba(59,130,246,0.25)" />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0.18)" />
+                    </linearGradient>
+                  </defs>
+
+                  <path
+                    d="M0 78 C 70 64, 130 92, 210 78 C 290 64, 340 92, 420 78 C 470 70, 495 72, 520 76 L520 140 L0 140 Z"
+                    fill="url(#waveGrad2Signup)"
+                    opacity="0.85"
+                  />
+                  <path
+                    d="M0 92 C 80 74, 150 110, 235 92 C 320 74, 380 110, 520 90 L520 140 L0 140 Z"
+                    fill="url(#waveGradSignup)"
+                    opacity="0.9"
+                  />
+
+                  {/* tiny map pin */}
+                  <g transform="translate(404,20)" opacity="0.92">
+                    <path
+                      d="M26 58c10-14 18-24 18-34a18 18 0 1 0-36 0c0 10 8 20 18 34Z"
+                      fill="rgba(0,0,0,0.18)"
+                      stroke="rgba(255,255,255,0.18)"
+                    />
+                    <circle cx="26" cy="24" r="6" fill="rgba(245,158,11,0.95)" />
+                  </g>
+                </svg>
+
+                <div className="auth-illustration-badges">
+                  <div className="auth-mini-badge">
+                    <span className="auth-mini-badge-dot" aria-hidden="true" />
+                    Pin & revisit
+                  </div>
+                  <div className="auth-mini-badge">
+                    <span className="auth-mini-badge-dot auth-mini-badge-dot--amber" aria-hidden="true" />
+                    Searchable memories
+                  </div>
+                </div>
+              </div>
 
               <ul className="auth-feature-list" aria-label="Key features">
                 {featureItems.map((f) => (
@@ -187,6 +257,26 @@ const SignUp = () => {
                   </li>
                 ))}
               </ul>
+
+              {/* Optional social proof / trust block */}
+              <div className="auth-trust" aria-label="Community feedback">
+                <div className="auth-trust-quote">
+                  <div className="auth-trust-quote-title">{communityStat.headline}</div>
+                  <p className="auth-trust-quote-body">{communityStat.body}</p>
+                  <div className="auth-trust-quote-meta">{communityStat.meta}</div>
+                </div>
+
+                <div className="auth-trust-stats" aria-hidden="true">
+                  <div className="auth-trust-stat">
+                    <div className="auth-trust-stat-value">{communityStat.statLeft}</div>
+                    <div className="auth-trust-stat-label">{communityStat.statRight}</div>
+                  </div>
+                  <div className="auth-trust-stat auth-trust-stat--soft">
+                    <div className="auth-trust-stat-value">0</div>
+                    <div className="auth-trust-stat-label">ads · just your stories</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </aside>
 

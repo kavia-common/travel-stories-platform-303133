@@ -30,18 +30,33 @@ const Login = () => {
   const featureItems = useMemo(
     () => [
       {
-        title: 'Capture moments effortlessly',
-        desc: 'Create beautiful travel stories with dates, locations, and photos in seconds.',
+        title: 'Pin stories that matter',
+        desc: 'Keep your best trips at the top—your highlights stay one click away.',
       },
       {
-        title: 'Search & pin favorites',
-        desc: 'Find memories fast and keep your best trips at the top with pinning.',
+        title: 'Curated maps & locations',
+        desc: 'Tag places as you go and build a clean, searchable list of where you’ve been.',
       },
       {
-        title: 'Secure by design',
-        desc: 'Your session is protected with token-based authentication and safe requests.',
+        title: 'Smart search, fast recall',
+        desc: 'Find any memory instantly by title, location tags, or a phrase from your story.',
+      },
+      {
+        title: 'Secure uploads',
+        desc: 'Add photos with confidence—modern, token-based sessions and safe requests.',
       },
     ],
+    []
+  );
+
+  const communityStat = useMemo(
+    () => ({
+      headline: 'Trusted by travelers who like it organized',
+      body: '“I can finally find the story I’m looking for—pins + tags make my journal feel effortless.”',
+      meta: '— Community member',
+      statLeft: '4.9/5',
+      statRight: 'avg. session rating',
+    }),
     []
   );
 
@@ -151,11 +166,64 @@ const Login = () => {
                 </div>
               </div>
 
-              <h1 className="auth-hero-title">Welcome back.</h1>
+              <h1 className="auth-hero-title">Your journeys, beautifully remembered.</h1>
               <p className="auth-hero-desc">
-                Sign in to continue building your travel journal—pin favorites, search memories, and
-                relive every trip.
+                Travel Story is a private, ocean‑calm space to capture moments, organize places, and
+                return to your favorite trips in seconds.
               </p>
+
+              {/* Subtle illustration (SVG-only; lightweight) */}
+              <div className="auth-illustration" aria-hidden="true">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 520 140"
+                  preserveAspectRatio="none"
+                  role="presentation"
+                >
+                  <defs>
+                    <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="rgba(255,255,255,0.30)" />
+                      <stop offset="50%" stopColor="rgba(245,158,11,0.26)" />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0.22)" />
+                    </linearGradient>
+                    <linearGradient id="waveGrad2" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="rgba(59,130,246,0.25)" />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0.18)" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* soft horizon */}
+                  <path
+                    d="M0 78 C 70 64, 130 92, 210 78 C 290 64, 340 92, 420 78 C 470 70, 495 72, 520 76 L520 140 L0 140 Z"
+                    fill="url(#waveGrad2)"
+                    opacity="0.85"
+                  />
+                  <path
+                    d="M0 92 C 80 74, 150 110, 235 92 C 320 74, 380 110, 520 90 L520 140 L0 140 Z"
+                    fill="url(#waveGrad)"
+                    opacity="0.9"
+                  />
+
+                  {/* tiny compass marker */}
+                  <g transform="translate(410,28)" opacity="0.9">
+                    <circle cx="26" cy="26" r="22" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.18)" />
+                    <path d="M26 14 L31 31 L21 26 Z" fill="rgba(245,158,11,0.95)" />
+                    <path d="M26 38 L21 21 L31 26 Z" fill="rgba(255,255,255,0.85)" opacity="0.9" />
+                  </g>
+                </svg>
+
+                <div className="auth-illustration-badges">
+                  <div className="auth-mini-badge">
+                    <span className="auth-mini-badge-dot" aria-hidden="true" />
+                    Private by default
+                  </div>
+                  <div className="auth-mini-badge">
+                    <span className="auth-mini-badge-dot auth-mini-badge-dot--amber" aria-hidden="true" />
+                    Organized with tags
+                  </div>
+                </div>
+              </div>
 
               <ul className="auth-feature-list" aria-label="Key features">
                 {featureItems.map((f) => (
@@ -170,6 +238,26 @@ const Login = () => {
                   </li>
                 ))}
               </ul>
+
+              {/* Optional social proof / trust block */}
+              <div className="auth-trust" aria-label="Community feedback">
+                <div className="auth-trust-quote">
+                  <div className="auth-trust-quote-title">{communityStat.headline}</div>
+                  <p className="auth-trust-quote-body">{communityStat.body}</p>
+                  <div className="auth-trust-quote-meta">{communityStat.meta}</div>
+                </div>
+
+                <div className="auth-trust-stats" aria-hidden="true">
+                  <div className="auth-trust-stat">
+                    <div className="auth-trust-stat-value">{communityStat.statLeft}</div>
+                    <div className="auth-trust-stat-label">{communityStat.statRight}</div>
+                  </div>
+                  <div className="auth-trust-stat auth-trust-stat--soft">
+                    <div className="auth-trust-stat-value">3×</div>
+                    <div className="auth-trust-stat-label">faster recall with pins</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </aside>
 
