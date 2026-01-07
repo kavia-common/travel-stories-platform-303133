@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/Input/PasswordInput';
 import { validateEmail } from '../../utils/helper';
@@ -9,11 +9,22 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const [error, setError] = useState(null);
+
+  // UI micro-interaction state
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('idle'); // idle | loading | success | error
+  const [shakeNonce, setShakeNonce] = useState(0);
 
   const navigate = useNavigate();
   const leftPanelRef = useRef(null);
+
+  useEffect(() => {
+    const t = window.requestAnimationFrame(() => setIsMounted(true));
+    return () => window.cancelAnimationFrame(t);
+  }, []);
 
   const featureItems = useMemo(
     () => [
@@ -37,27 +48,36 @@ const SignUp = () => {
     e.preventDefault();
 
     if (!name) {
+      setSubmitStatus('error');
       setError('Please enter your name');
+      setShakeNonce((n) => n + 1);
       return;
     }
 
     if (!validateEmail(email)) {
+      setSubmitStatus('error');
       setError('Please enter a valid email address.');
+      setShakeNonce((n) => n + 1);
       return;
     }
 
     if (!password) {
+      setSubmitStatus('error');
       setError('Please enter the password.');
+      setShakeNonce((n) => n + 1);
       return;
     }
 
     if (password.length < 6) {
+      setSubmitStatus('error');
       setError('Password must be at least 6 characters long.');
+      setShakeNonce((n) => n + 1);
       return;
     }
 
     setError('');
     setIsLoading(true);
+    setSubmitStatus('loading');
 
     // SignUp API Call
     try {
@@ -68,13 +88,18 @@ const SignUp = () => {
       });
 
       if (response.data && response.data.accessToken) {
+        setSubmitStatus('success');
         localStorage.setItem('token', response.data.accessToken);
         navigate('/dashboard');
       } else if (response.data && response.data.message) {
         // If registration successful but no token, redirect to login
+        setSubmitStatus('success');
         navigate('/login');
       }
     } catch (error) {
+      setSubmitStatus('error');
+      setShakeNonce((n) => n + 1);
+
       if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message);
       } else {
@@ -109,7 +134,7 @@ const SignUp = () => {
       <Navbar />
 
       <div className="auth-container">
-        <div className="auth-shell" aria-label="Sign up page">
+        <div className={`auth-shell ${isMounted ? 'is-mounted' : ''}`} aria-label="Sign up page">
           {/* Left Brand/Info Panel */}
           <aside
             className="auth-left"
@@ -167,7 +192,12 @@ const SignUp = () => {
 
           {/* Right Form Panel */}
           <section className="auth-right" aria-label="Create account form">
-            <div className="auth-card" role="region" aria-labelledby="signup-title">
+            <div
+              className={`auth-card ${submitStatus === 'error' && shakeNonce ? 'is-shaking' : ''}`}
+              key={shakeNonce}
+              role="region"
+              aria-labelledby="signup-title"
+            >
               <h4 className="auth-title" id="signup-title">
                 Create account
               </h4>
@@ -175,8 +205,8 @@ const SignUp = () => {
                 Join in seconds. You can start creating stories right after signup.
               </p>
 
-              <form onSubmit={handleSignUp}>
-                <div className="mb-4">
+              <form onSubmit={handleSignUp} aria-busy={isLoading}>
+                <div className={`auth-field ${error && !name ? 'is-invalid' : name ? 'is-valid' : ''}`}>
                   <label className="input-label" htmlFor="signup-name">
                     Full Name
                   </label>
@@ -189,11 +219,15 @@ const SignUp = () => {
                     className="input-box"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    aria-invalid={Boolean(error)}
+                    aria-invalid={Boolean(error && !name)}
                   />
                 </div>
 
-                <div className="mb-4">
+                <div
+                  className={`auth-field ${
+                    error && !validateEmail(email) ? 'is-invalid' : email && validateEmail(email) ? 'is-valid' : ''
+                  }`}
+                >
                   <label className="input-label" htmlFor="signup-email">
                     Email Address
                   </label>
@@ -207,11 +241,15 @@ const SignUp = () => {
                     className="input-box"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    aria-invalid={Boolean(error)}
+                    aria-invalid={Boolean(error && !validateEmail(email))}
                   />
                 </div>
 
-                <div className="mb-2">
+                <div
+                  className={`auth-field ${
+                    error && (!password || password.length < 6) ? 'is-invalid' : password ? 'is-valid' : ''
+                  }`}
+                >
                   <label className="input-label" htmlFor="signup-password">
                     Password
                   </label>
@@ -226,19 +264,29 @@ const SignUp = () => {
                   />
                 </div>
 
-                {error && (
-                  <p
-                    className="text-red-500 text-xs pb-1 animate-fadeIn"
-                    style={{ marginTop: '0.5rem' }}
-                    role="alert"
-                    aria-live="polite"
-                  >
-                    {error}
-                  </p>
-                )}
+                <div
+                  className="auth-feedback"
+                  role={error ? 'alert' : 'status'}
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {error ? (
+                    <span className="auth-feedback--error">{error}</span>
+                  ) : submitStatus === 'success' ? (
+                    <span className="auth-feedback--success">Success. Redirecting…</span>
+                  ) : null}
+                </div>
 
-                <button type="submit" className="btn-primary w-full mt-4" disabled={isLoading}>
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                <button
+                  type="submit"
+                  className="btn-primary w-full mt-4"
+                  disabled={isLoading}
+                  aria-disabled={isLoading}
+                >
+                  <span className="auth-btn-content">
+                    {isLoading && <span className="auth-spinner" aria-hidden="true" />}
+                    <span>{isLoading ? 'Creating Account...' : 'Create Account'}</span>
+                  </span>
                 </button>
 
                 <p className="text-sm text-center mt-6" style={{ color: 'var(--text-light)' }}>

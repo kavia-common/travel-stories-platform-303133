@@ -65,8 +65,17 @@
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
 
-  animation: scaleIn 0.45s ease-out;
+  /* Will be triggered via .auth-shell.is-mounted for better control */
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(10px);
+}
+
+.auth-shell.is-mounted {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .auth-left {
@@ -255,14 +264,25 @@
   border: 1px solid var(--border);
   position: relative;
 
-  animation: fadeIn 0.55s ease-out 0.1s both;
+  /* Card reveal driven by .auth-shell.is-mounted */
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
   backdrop-filter: blur(10px);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.auth-shell.is-mounted .auth-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .auth-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-2xl);
+  border-color: rgba(37, 99, 235, 0.25);
 }
 
 .auth-card::before {
@@ -293,12 +313,37 @@
 }
 
 .auth-card form {
-  animation: fadeIn 0.5s ease-out 0.2s both;
+  /* Reveal is staggered with children; keep form itself stable */
 }
 
 .auth-card .input-box {
   margin-bottom: 1.1rem;
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base),
+    transform var(--transition-base), background var(--transition-base);
+  will-change: transform;
+}
+
+/* Staggered reveal: title, subtitle, fields, CTA */
+.auth-card > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-shell.is-mounted .auth-card > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.auth-shell.is-mounted .auth-card > :nth-child(1) {
+  transition-delay: 170ms;
+}
+.auth-shell.is-mounted .auth-card > :nth-child(2) {
+  transition-delay: 220ms;
+}
+.auth-shell.is-mounted .auth-card > :nth-child(3) {
+  transition-delay: 270ms;
 }
 
 .auth-card .btn-primary {
@@ -306,6 +351,77 @@
   width: 100%;
   padding: 1rem;
   font-size: 0.95rem;
+}
+
+/* Input micro-interactions (local to auth card) */
+.auth-field {
+  margin-bottom: 1.1rem;
+}
+
+.auth-field.is-invalid .input-box,
+.auth-field.is-invalid .password-input-wrapper {
+  border-color: rgba(239, 68, 68, 0.85);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.auth-field.is-valid .input-box,
+.auth-field.is-valid .password-input-wrapper {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.10);
+}
+
+@keyframes authShake {
+  0% { transform: translateX(0); }
+  16% { transform: translateX(-5px); }
+  33% { transform: translateX(5px); }
+  50% { transform: translateX(-4px); }
+  66% { transform: translateX(4px); }
+  83% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+.auth-card.is-shaking {
+  animation: authShake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Submit feedback area */
+.auth-feedback {
+  min-height: 20px;
+  margin-top: 0.65rem;
+  font-size: 0.75rem;
+  line-height: 1.05rem;
+  font-weight: 600;
+}
+
+.auth-feedback--error {
+  color: var(--error);
+}
+
+.auth-feedback--success {
+  color: var(--success);
+}
+
+/* Loading button content */
+.auth-btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.auth-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.95);
+  animation: authSpin 800ms linear infinite;
+}
+
+@keyframes authSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* A11y helper */
@@ -336,17 +452,29 @@
   .auth-container::after {
     animation: none !important;
   }
+
   .auth-shell,
-  .auth-card {
-    animation: none !important;
+  .auth-card,
+  .auth-card > * {
+    transition: none !important;
   }
+
   .auth-feature,
   .auth-card,
   .auth-brand-badge {
     transition: none !important;
   }
+
   .auth-blob {
     transition: none !important;
+  }
+
+  .auth-card.is-shaking {
+    animation: none !important;
+  }
+
+  .auth-spinner {
+    animation: none !important;
   }
 }
 
