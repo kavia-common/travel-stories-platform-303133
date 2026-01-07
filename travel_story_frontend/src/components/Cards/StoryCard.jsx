@@ -3,6 +3,7 @@ import { FaHeart } from "react-icons/fa6";
 import { MdOutlineLocationOn, MdCreate, MdDelete, MdPushPin } from "react-icons/md";
 import { GrMapLocation } from "react-icons/gr";
 import moment from 'moment';
+import { FILE_BASE_URL } from '../../utils/constants';
 
 const StoryCard = ({
   imgUrl,
@@ -20,7 +21,7 @@ const StoryCard = ({
   return (
     <div className="story-card">
       <img
-        src={imgUrl}
+        src={imgUrl && imgUrl.startsWith("http") ? imgUrl : `${FILE_BASE_URL}${imgUrl}`}
         alt={title}
         className="story-img cursor-pointer"
         onClick={onClick}

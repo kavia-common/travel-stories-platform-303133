@@ -7,6 +7,7 @@ import TagInput from '../../components/Input/TagInput';
 import axiosInstance from '../../utils/axiosInstance';
 import uploadImage from '../../utils/uploadImage';
 import moment from 'moment';
+import { FILE_BASE_URL } from '../../utils/constants';
 
 const AddEditTravelStory = ({
   storyInfo,
@@ -172,7 +173,11 @@ const AddEditTravelStory = ({
             <div className="mt-1">
                 {storyImg ? (
                     <div className="relative w-full h-[300px] rounded-lg overflow-hidden">
-                        <img src={storyImg} alt="Story" className="w-full h-full object-cover" />
+                        <img 
+                            src={storyImg && storyImg.startsWith("http") ? storyImg : `${FILE_BASE_URL}${storyImg}`}
+                            alt="Story" 
+                            className="w-full h-full object-cover" 
+                        />
                         <button 
                             className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md"
                             onClick={handleDeleteStoryImg}
