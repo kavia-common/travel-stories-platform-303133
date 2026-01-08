@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Navbar from '../../components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
@@ -15,6 +15,9 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  // Mount reveal for header animation
+  const [isMounted, setIsMounted] = useState(false);
+
   const [openAddEditModal, setOpenAddEditModal] = useState({
     isShown: false,
     type: 'add',
@@ -25,6 +28,11 @@ const Home = () => {
 
   // Set modal root
   Modal.setAppElement('#root');
+
+  const pinnedCount = useMemo(
+    () => allStories.reduce((acc, s) => acc + (s?.isFavourite ? 1 : 0), 0),
+    [allStories]
+  );
 
   // Get User Info
   const getUserInfo = async () => {
@@ -106,6 +114,12 @@ const Home = () => {
   };
 
   useEffect(() => {
+    // Trigger mount reveal on next frame for smoother initial paint
+    const t = window.requestAnimationFrame(() => setIsMounted(true));
+    return () => window.cancelAnimationFrame(t);
+  }, []);
+
+  useEffect(() => {
     getUserInfo();
     getAllTravelStories();
     return () => {};
@@ -122,15 +136,41 @@ const Home = () => {
       />
 
       <div className="container mx-auto px-6 py-10">
-        {/* Header Section */}
-        <div className="mb-8 animate-fadeIn">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
-            Your Travel Stories
-          </h1>
-          <p className="text-base" style={{ color: 'var(--text-light)' }}>
-            Capture and cherish your travel memories
-          </p>
-        </div>
+        {/* Enhanced Header Section */}
+        <header className={`dashboard-header ${isMounted ? 'is-mounted' : ''}`} aria-label="Dashboard header">
+          <div className="dashboard-header__bg" aria-hidden="true" />
+          <div className="dashboard-header__content">
+            <div className="dashboard-header__eyebrow">
+              <span className="dashboard-header__dot" aria-hidden="true" />
+              <span className="dashboard-header__eyebrow-text">
+                {userInfo?.fullName ? `Welcome, ${userInfo.fullName}` : 'Your dashboard'}
+              </span>
+            </div>
+
+            <h1 className="dashboard-header__title">Your Travel Stories</h1>
+
+            <p className="dashboard-header__subtitle">
+              Capture and cherish your travel memories with a clean, modern journaling flow.
+            </p>
+
+            <div className="dashboard-header__chips" aria-label="Story summary">
+              <div className="dashboard-chip" role="group" aria-label="Total stories">
+                <div className="dashboard-chip__label">Stories</div>
+                <div className="dashboard-chip__value">{allStories?.length ?? 0}</div>
+              </div>
+
+              <div className="dashboard-chip" role="group" aria-label="Pinned stories">
+                <div className="dashboard-chip__label">Pinned</div>
+                <div className="dashboard-chip__value">{pinnedCount}</div>
+              </div>
+
+              <div className="dashboard-chip dashboard-chip--accent" role="group" aria-label="Search status">
+                <div className="dashboard-chip__label">Search</div>
+                <div className="dashboard-chip__value">{searchQuery ? 'Active' : 'Off'}</div>
+              </div>
+            </div>
+          </div>
+        </header>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
@@ -144,10 +184,10 @@ const Home = () => {
           <div className="grid grid-cols-3 gap-8 mt-8">
             {allStories.map((item, index) => {
               return (
-                <div 
-                  key={item._id} 
-                  style={{ 
-                    animation: `fadeIn 0.5s ease-out ${index * 0.1}s both` 
+                <div
+                  key={item._id}
+                  style={{
+                    animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`,
                   }}
                 >
                   <StoryCard
@@ -157,9 +197,7 @@ const Home = () => {
                     date={item.visitedDate}
                     visitedLocation={item.visitedLocation}
                     isFavourite={item.isFavourite}
-                    onEdit={() =>
-                      setOpenAddEditModal({ isShown: true, type: 'edit', data: item })
-                    }
+                    onEdit={() => setOpenAddEditModal({ isShown: true, type: 'edit', data: item })}
                     onClick={() => {}}
                     onPinNote={() => updateIsFavourite(item)}
                     onDelete={() => deleteTravelStory(item)}

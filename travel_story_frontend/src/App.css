@@ -1012,6 +1012,243 @@
 }
 
 /* ============================================
+   DASHBOARD HEADER (Enhanced visuals)
+   ============================================ */
+
+.dashboard-header {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  padding: 2.25rem 2.25rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(245, 158, 11, 0.04) 50%, rgba(17, 24, 39, 0.00) 100%);
+  margin-bottom: 2rem;
+
+  /* reveal */
+  opacity: 0;
+  transform: translateY(10px) scale(0.99);
+  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-header.is-mounted {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.dashboard-header__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 420px at 20% 20%, rgba(37, 99, 235, 0.18) 0%, transparent 60%),
+    radial-gradient(760px 520px at 80% 30%, rgba(245, 158, 11, 0.14) 0%, transparent 62%),
+    radial-gradient(900px 520px at 55% 120%, rgba(59, 130, 246, 0.10) 0%, transparent 65%);
+  opacity: 0.85;
+}
+
+.dashboard-header__bg::before {
+  /* subtle “sheen” animation */
+  content: '';
+  position: absolute;
+  inset: -40%;
+  left: -90%;
+  transform: skewX(-16deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  filter: blur(0px);
+  opacity: 0.65;
+  animation: dashSheen 6.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes dashSheen {
+  0% { left: -90%; }
+  45% { left: 115%; }
+  100% { left: 115%; }
+}
+
+.dashboard-header__content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.dashboard-header__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+
+  /* stagger */
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+    transform 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms;
+}
+
+.dashboard-header.is-mounted .dashboard-header__eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dashboard-header__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.10);
+}
+
+.dashboard-header__eyebrow-text {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.76);
+}
+
+.dashboard-header__title {
+  margin-top: 1rem;
+  font-size: 2.25rem;
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--text-main);
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1) 170ms,
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1) 170ms;
+}
+
+.dashboard-header.is-mounted .dashboard-header__title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dashboard-header__subtitle {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.75rem;
+  color: rgba(75, 85, 99, 0.92);
+  max-width: 62ch;
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1) 220ms;
+}
+
+.dashboard-header.is-mounted .dashboard-header__subtitle {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dashboard-header__chips {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1) 270ms,
+    transform 560ms cubic-bezier(0.16, 1, 0.3, 1) 270ms;
+}
+
+.dashboard-header.is-mounted .dashboard-header__chips {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dashboard-chip {
+  min-width: 140px;
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.dashboard-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(37, 99, 235, 0.22);
+}
+
+.dashboard-chip__label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(107, 114, 128, 0.95);
+}
+
+.dashboard-chip__value {
+  margin-top: 0.35rem;
+  font-size: 1.125rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.dashboard-chip--accent {
+  border-color: rgba(245, 158, 11, 0.22);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(37, 99, 235, 0.10) 100%);
+}
+
+.dashboard-chip--accent .dashboard-chip__label {
+  color: rgba(17, 24, 39, 0.72);
+}
+
+.dashboard-chip--accent .dashboard-chip__value {
+  color: rgba(17, 24, 39, 0.92);
+}
+
+/* Responsive tweaks for header */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .dashboard-header__title {
+    font-size: 1.85rem;
+  }
+
+  .dashboard-chip {
+    min-width: 120px;
+    flex: 1;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-header,
+  .dashboard-header__eyebrow,
+  .dashboard-header__title,
+  .dashboard-header__subtitle,
+  .dashboard-header__chips {
+    transition: none !important;
+  }
+
+  .dashboard-header__bg::before {
+    animation: none !important;
+  }
+
+  .dashboard-chip {
+    transition: none !important;
+  }
+}
+
+/* ============================================
    RESPONSIVE DESIGN
    ============================================ */
 
