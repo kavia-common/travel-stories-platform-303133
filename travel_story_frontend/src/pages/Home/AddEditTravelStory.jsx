@@ -12,11 +12,12 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
   const [title, setTitle] = useState(storyInfo?.title || '');
   const [story, setStory] = useState(storyInfo?.story || '');
   const [visitedLocation, setVisitedLocation] = useState(storyInfo?.visitedLocation || []);
-  const [visitedDate, setVisitedDate] = useState(
-    storyInfo?.visitedDate ? new Date(storyInfo.visitedDate) : null
-  );
+  const [visitedDate, setVisitedDate] = useState(storyInfo?.visitedDate ? new Date(storyInfo.visitedDate) : null);
   const [error, setError] = useState(null);
+
+  // Backward compatible: story may store either a Cloudinary URL (secure_url) or a legacy relative path.
   const [storyImg, setStoryImg] = useState(storyInfo?.imageUrl || null);
+
   const [uploading, setUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -26,17 +27,26 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploading(true);
-      try {
-        const data = await uploadImage(file);
-        setStoryImg(data.imageUrl);
-      } catch (err) {
-        setError('Failed to upload image');
-      } finally {
-        setUploading(false);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const data = await uploadImage(file);
+
+      // uploadImage normalizes to always return imageUrl; still allow secure_url/url for safety.
+      const url = data?.imageUrl || data?.secure_url || data?.url;
+      if (!url) {
+        setError('Upload succeeded but no image URL was returned.');
+        return;
       }
+
+      setStoryImg(url);
+      setError('');
+    } catch (err) {
+      setError('Failed to upload image');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -112,6 +122,8 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
     }
   };
 
+  const previewSrc = storyImg ? (storyImg.startsWith('http') ? storyImg : `${FILE_BASE_URL}${storyImg}`) : '';
+
   return (
     <div className="relative">
       <div className="flex items-center justify-between mb-6">
@@ -170,24 +182,13 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
           <div className="mt-2">
             {storyImg ? (
               <div className="image-preview-container">
-                <img
-                  src={
-                    storyImg && storyImg.startsWith('http')
-                      ? storyImg
-                      : `${FILE_BASE_URL}${storyImg}`
-                  }
-                  alt="Story"
-                  className="w-full h-full object-cover"
-                />
+                <img src={previewSrc} alt="Story" className="w-full h-full object-cover" />
                 <button className="image-delete-btn" onClick={handleDeleteStoryImg}>
                   <MdDelete className="text-xl" style={{ color: 'var(--error)' }} />
                 </button>
               </div>
             ) : (
-              <div
-                className="image-upload-area"
-                onClick={() => document.getElementById('imageUpload').click()}
-              >
+              <div className="image-upload-area" onClick={() => document.getElementById('imageUpload').click()}>
                 <MdAdd className="text-4xl" style={{ color: 'var(--primary)' }} />
                 <span className="text-sm font-medium mt-2" style={{ color: 'var(--text-light)' }}>
                   {uploading ? 'Uploading...' : 'Click to add image'}
@@ -214,11 +215,7 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
           <button className="btn-outline" onClick={onClose}>
             Cancel
           </button>
-          <button 
-            className="btn-primary px-8" 
-            onClick={handleAddOrUpdateClick}
-            disabled={isSaving || uploading}
-          >
+          <button className="btn-primary px-8" onClick={handleAddOrUpdateClick} disabled={isSaving || uploading}>
             {isSaving ? 'Saving...' : type === 'add' ? 'Add Story' : 'Update Story'}
           </button>
         </div>

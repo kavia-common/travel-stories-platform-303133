@@ -1,19 +1,24 @@
 import React from 'react';
-import { MdOutlineLocationOn, MdCreate, MdDelete, MdPushPin } from 'react-icons/md';
+import { MdCreate, MdDelete, MdPushPin } from 'react-icons/md';
 import { GrMapLocation } from 'react-icons/gr';
 import moment from 'moment';
 import { FILE_BASE_URL } from '../../utils/constants';
 
 // PUBLIC_INTERFACE
 /**
- * StoryCard component displays a travel story with image, title, description, location, and action buttons
- * @param {string} imgUrl - URL of the story image
+ * StoryCard component displays a travel story with image, title, description, location, and action buttons.
+ *
+ * It supports Cloudinary URLs (secure_url) and legacy relative paths:
+ * - If imgUrl is an absolute URL (http/https), it is rendered as-is.
+ * - Otherwise it is treated as a backend-served relative path and prefixed with FILE_BASE_URL.
+ *
+ * @param {string|Object} imgUrl - URL of the story image. Can be a string or an upload payload object.
  * @param {string} title - Title of the story
  * @param {string|number} date - Date of the visit (timestamp or date string)
  * @param {string} story - Story description
  * @param {Array<string>} visitedLocation - Array of visited locations
  * @param {boolean} isFavourite - Whether the story is pinned/favourited
- * @param {Function} onFavouriteClick - Callback for favourite button click
+ * @param {Function} onFavouriteClick - Callback for favourite button click (kept for compatibility)
  * @param {Function} onEdit - Callback for edit button click
  * @param {Function} onClick - Callback for card click
  * @param {Function} onPinNote - Callback for pin button click
@@ -26,12 +31,23 @@ const StoryCard = ({
   story,
   visitedLocation,
   isFavourite,
-  onFavouriteClick,
+  onFavouriteClick, // eslint-disable-line no-unused-vars
   onEdit,
   onClick,
   onPinNote,
   onDelete,
 }) => {
+  const resolvedImgUrl =
+    (typeof imgUrl === 'object' && imgUrl
+      ? imgUrl.secure_url || imgUrl.imageUrl || imgUrl.url
+      : imgUrl) || '';
+
+  const imgSrc = resolvedImgUrl
+    ? resolvedImgUrl.startsWith('http')
+      ? resolvedImgUrl
+      : `${FILE_BASE_URL}${resolvedImgUrl}`
+    : '';
+
   return (
     <div className="story-card">
       {/* Pin Badge */}
@@ -61,12 +77,24 @@ const StoryCard = ({
       )}
 
       <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <img
-          src={imgUrl && imgUrl.startsWith('http') ? imgUrl : `${FILE_BASE_URL}${imgUrl}`}
-          alt={title}
-          className="story-img cursor-pointer"
-          onClick={onClick}
-        />
+        {imgSrc ? (
+          <img src={imgSrc} alt={title} className="story-img cursor-pointer" onClick={onClick} />
+        ) : (
+          <div
+            className="story-img"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(245, 158, 11, 0.06) 100%)',
+              color: 'var(--text-light)',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            No image
+          </div>
+        )}
       </div>
 
       <div className="story-content">
@@ -118,20 +146,10 @@ const StoryCard = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              className="icon-btn"
-              onClick={onEdit}
-              style={{ color: 'var(--text-light)' }}
-              title="Edit Story"
-            >
+            <button className="icon-btn" onClick={onEdit} style={{ color: 'var(--text-light)' }} title="Edit Story">
               <MdCreate className="text-xl hover:text-primary" style={{ transition: 'color 0.2s' }} />
             </button>
-            <button
-              className="icon-btn"
-              onClick={onDelete}
-              style={{ color: 'var(--text-light)' }}
-              title="Delete Story"
-            >
+            <button className="icon-btn" onClick={onDelete} style={{ color: 'var(--text-light)' }} title="Delete Story">
               <MdDelete className="text-xl hover:text-error" style={{ transition: 'color 0.2s' }} />
             </button>
           </div>
