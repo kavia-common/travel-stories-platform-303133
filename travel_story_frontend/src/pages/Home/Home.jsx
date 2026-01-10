@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Navbar from '../../components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
+import Header from '../../components/Header/Header';
+import Filters from '../../components/Filters/Filters';
 import StoryCard from '../../components/Cards/StoryCard';
 import StoryCardSkeleton from '../../components/Cards/StoryCardSkeleton';
 import AddEditTravelStory from './AddEditTravelStory';
@@ -9,12 +10,21 @@ import Modal from 'react-modal';
 import { MdAdd } from 'react-icons/md';
 import EmptyCard from '../../components/Cards/EmptyCard';
 import { getEmptyCardMessage } from '../../utils/helper';
+import '../../components/Header/Header.css';
+import '../../components/Filters/Filters.css';
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [allStories, setAllStories] = useState([]);
+  const [filteredStories, setFilteredStories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  // Filter states
+  const [showPinnedOnly, setShowPinnedOnly] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [selectedLocations, setSelectedLocations] = useState([]);
 
   // Mount reveal for header animation
   const [isMounted, setIsMounted] = useState(false);
@@ -34,6 +44,47 @@ const Home = () => {
     () => allStories.reduce((acc, s) => acc + (s?.isFavourite ? 1 : 0), 0),
     [allStories]
   );
+
+  // Extract all unique locations from stories
+  const availableLocations = useMemo(() => {
+    const locations = new Set();
+    allStories.forEach((story) => {
+      if (story.visitedLocation && Array.isArray(story.visitedLocation)) {
+        story.visitedLocation.forEach((loc) => locations.add(loc));
+      }
+    });
+    return Array.from(locations).sort();
+  }, [allStories]);
+
+  // Apply filters to stories
+  useEffect(() => {
+    let result = [...allStories];
+
+    // Pinned filter
+    if (showPinnedOnly) {
+      result = result.filter((story) => story.isFavourite);
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      result = result.filter((story) => {
+        const storyDate = new Date(story.visitedDate);
+        const start = startDate ? new Date(startDate) : new Date(0);
+        const end = endDate ? new Date(endDate) : new Date();
+        return storyDate >= start && storyDate <= end;
+      });
+    }
+
+    // Location filter
+    if (selectedLocations.length > 0) {
+      result = result.filter((story) => {
+        if (!story.visitedLocation || !Array.isArray(story.visitedLocation)) return false;
+        return story.visitedLocation.some((loc) => selectedLocations.includes(loc));
+      });
+    }
+
+    setFilteredStories(result);
+  }, [allStories, showPinnedOnly, startDate, endDate, selectedLocations]);
 
   // Get User Info
   const getUserInfo = async () => {
@@ -114,6 +165,35 @@ const Home = () => {
     }
   };
 
+  const onLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const handleTogglePinned = () => {
+    setShowPinnedOnly(!showPinnedOnly);
+  };
+
+  const handleDateRangeChange = (start, end) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const handleLocationToggle = (location) => {
+    setSelectedLocations((prev) =>
+      prev.includes(location) ? prev.filter((loc) => loc !== location) : [...prev, location]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setShowPinnedOnly(false);
+    setStartDate(null);
+    setEndDate(null);
+    setSelectedLocations([]);
+  };
+
+  const hasActiveFilters = showPinnedOnly || startDate || endDate || selectedLocations.length > 0;
+
   useEffect(() => {
     // Trigger mount reveal on next frame for smoother initial paint
     const t = window.requestAnimationFrame(() => setIsMounted(true));
@@ -128,12 +208,13 @@ const Home = () => {
 
   return (
     <>
-      <Navbar
+      <Header
         userInfo={userInfo}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onSearchNote={onSearchStory}
         handleClearSearch={handleClearSearch}
+        onLogout={onLogout}
       />
 
       <div className="container mx-auto px-6 py-10">
@@ -157,7 +238,7 @@ const Home = () => {
             <div className="dashboard-header__chips" aria-label="Story summary">
               <div className="dashboard-chip" role="group" aria-label="Total stories">
                 <div className="dashboard-chip__label">Stories</div>
-                <div className="dashboard-chip__value">{allStories?.length ?? 0}</div>
+                <div className="dashboard-chip__value">{filteredStories?.length ?? 0}</div>
               </div>
 
               <div className="dashboard-chip" role="group" aria-label="Pinned stories">
@@ -165,13 +246,26 @@ const Home = () => {
                 <div className="dashboard-chip__value">{pinnedCount}</div>
               </div>
 
-              <div className="dashboard-chip dashboard-chip--accent" role="group" aria-label="Search status">
-                <div className="dashboard-chip__label">Search</div>
-                <div className="dashboard-chip__value">{searchQuery ? 'Active' : 'Off'}</div>
+              <div className="dashboard-chip dashboard-chip--accent" role="group" aria-label="Filter status">
+                <div className="dashboard-chip__label">Filters</div>
+                <div className="dashboard-chip__value">{hasActiveFilters ? 'Active' : 'Off'}</div>
               </div>
             </div>
           </div>
         </header>
+
+        {/* Filters Section */}
+        <Filters
+          showPinnedOnly={showPinnedOnly}
+          onTogglePinned={handleTogglePinned}
+          startDate={startDate}
+          endDate={endDate}
+          onDateRangeChange={handleDateRangeChange}
+          selectedLocations={selectedLocations}
+          availableLocations={availableLocations}
+          onLocationToggle={handleLocationToggle}
+          onClearFilters={handleClearFilters}
+        />
 
         {isLoading ? (
           <div className="grid grid-cols-3 gap-8 mt-8" role="status" aria-label="Loading stories">
@@ -179,9 +273,9 @@ const Home = () => {
               <StoryCardSkeleton key={`skeleton-${index}`} />
             ))}
           </div>
-        ) : allStories.length > 0 ? (
+        ) : filteredStories.length > 0 ? (
           <div className="grid grid-cols-3 gap-8 mt-8" role="list" aria-label="Travel stories">
-            {allStories.map((item, index) => {
+            {filteredStories.map((item, index) => {
               return (
                 <div
                   key={item._id}
@@ -207,7 +301,13 @@ const Home = () => {
             })}
           </div>
         ) : (
-          <EmptyCard message={getEmptyCardMessage(searchQuery ? 'search' : 'No notes')} />
+          <EmptyCard
+            message={
+              hasActiveFilters
+                ? 'No stories match the selected filters. Try adjusting your criteria.'
+                : getEmptyCardMessage(searchQuery ? 'search' : 'No notes')
+            }
+          />
         )}
       </div>
 

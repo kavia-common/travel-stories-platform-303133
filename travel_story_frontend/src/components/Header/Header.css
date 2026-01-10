@@ -1,0 +1,241 @@
+/* ============================================
+   HEADER COMPONENT (Ocean Professional)
+   Modern, sticky header with gradient and polish
+   ============================================ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(249, 250, 251, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: all 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Initial reveal state */
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.header--mounted {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.header--scrolled {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(255, 255, 255, 0.98) 100%);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08), 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.header__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Brand Section */
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-shrink: 0;
+}
+
+.header__logo {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.header__logo:hover {
+  transform: translateY(-2px) rotate(-3deg);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.header__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  user-select: none;
+}
+
+/* Actions Section */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+  justify-content: flex-end;
+  max-width: 800px;
+}
+
+/* Search Section */
+.header__search {
+  flex: 1;
+  max-width: 420px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 0.75rem 1.125rem;
+  transition: all var(--transition-base);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.search-input-wrapper:focus-within {
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.search-input__icon {
+  font-size: 1.125rem;
+  color: var(--text-lighter);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.search-input-wrapper:focus-within .search-input__icon {
+  color: var(--primary);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  color: var(--text-main);
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  min-width: 0;
+}
+
+.search-input::placeholder {
+  color: var(--text-lighter);
+  font-weight: 400;
+}
+
+.search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-input__clear {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.375rem;
+  margin-left: 0.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.search-input__clear:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+  transform: scale(1.1);
+}
+
+.search-input__clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .header__container {
+    padding: 1rem 1.5rem;
+  }
+
+  .header__search {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header__container {
+    padding: 0.875rem 1rem;
+    gap: 1rem;
+  }
+
+  .header__brand {
+    gap: 0.625rem;
+  }
+
+  .header__logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .header__title {
+    font-size: 1.25rem;
+  }
+
+  .header__search {
+    max-width: 240px;
+  }
+
+  .search-input-wrapper {
+    padding: 0.625rem 1rem;
+  }
+
+  .search-input {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .header__container {
+    flex-wrap: wrap;
+  }
+
+  .header__actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .header__search {
+    flex: 1;
+    max-width: 100%;
+    order: 2;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .header__logo,
+  .search-input-wrapper,
+  .search-input__clear {
+    transition: none !important;
+  }
+}
