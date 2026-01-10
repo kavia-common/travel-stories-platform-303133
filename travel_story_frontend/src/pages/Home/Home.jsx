@@ -3,6 +3,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import StoryCard from '../../components/Cards/StoryCard';
+import StoryCardSkeleton from '../../components/Cards/StoryCardSkeleton';
 import AddEditTravelStory from './AddEditTravelStory';
 import Modal from 'react-modal';
 import { MdAdd } from 'react-icons/md';
@@ -122,7 +123,7 @@ const Home = () => {
   useEffect(() => {
     getUserInfo();
     getAllTravelStories();
-    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -173,21 +174,20 @@ const Home = () => {
         </header>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-pulse">
-              <div className="text-2xl" style={{ color: 'var(--text-light)' }}>
-                Loading your stories...
-              </div>
-            </div>
+          <div className="grid grid-cols-3 gap-8 mt-8" role="status" aria-label="Loading stories">
+            {[...Array(6)].map((_, index) => (
+              <StoryCardSkeleton key={`skeleton-${index}`} />
+            ))}
           </div>
         ) : allStories.length > 0 ? (
-          <div className="grid grid-cols-3 gap-8 mt-8">
+          <div className="grid grid-cols-3 gap-8 mt-8" role="list" aria-label="Travel stories">
             {allStories.map((item, index) => {
               return (
                 <div
                   key={item._id}
+                  role="listitem"
                   style={{
-                    animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`,
+                    animation: `fadeIn 0.5s ease-out ${index * 0.08}s both`,
                   }}
                 >
                   <StoryCard
@@ -217,9 +217,10 @@ const Home = () => {
         onClick={() => {
           setOpenAddEditModal({ isShown: true, type: 'add', data: null });
         }}
+        aria-label="Add new travel story"
         title="Add New Story"
       >
-        <MdAdd className="text-[32px]" />
+        <MdAdd className="text-[32px]" aria-hidden="true" />
       </button>
 
       {/* Modal */}

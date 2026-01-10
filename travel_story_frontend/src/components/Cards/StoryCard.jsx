@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MdCreate, MdDelete, MdPushPin } from 'react-icons/md';
 import { GrMapLocation } from 'react-icons/gr';
 import moment from 'moment';
@@ -7,6 +7,9 @@ import { FILE_BASE_URL } from '../../utils/constants';
 // PUBLIC_INTERFACE
 /**
  * StoryCard component displays a travel story with image, title, description, location, and action buttons.
+ *
+ * Enhanced with Ocean Professional theme, smooth transitions, accessible focus states,
+ * improved hover interactions, and responsive touch-friendly targets.
  *
  * It supports Cloudinary URLs (secure_url) and legacy relative paths:
  * - If imgUrl is an absolute URL (http/https), it is rendered as-is.
@@ -37,6 +40,9 @@ const StoryCard = ({
   onPinNote,
   onDelete,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const resolvedImgUrl =
     (typeof imgUrl === 'object' && imgUrl
       ? imgUrl.secure_url || imgUrl.imageUrl || imgUrl.url
@@ -49,94 +55,101 @@ const StoryCard = ({
     : '';
 
   return (
-    <div className="story-card">
-      {/* Pin Badge */}
+    <article className="story-card" aria-label={`Travel story: ${title}`}>
+      {/* Pin Badge - Enhanced with better positioning and animation */}
       {isFavourite && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            background: 'linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%)',
-            color: 'white',
-            padding: '0.375rem 0.75rem',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem',
-            boxShadow: 'var(--shadow-lg)',
-            zIndex: 10,
-            animation: 'scaleIn 0.3s ease-out',
-          }}
-        >
-          <MdPushPin className="text-sm" />
-          Pinned
+        <div className="story-card__pin-badge" aria-label="Pinned story">
+          <MdPushPin className="text-sm" aria-hidden="true" />
+          <span>Pinned</span>
         </div>
       )}
 
-      <div style={{ position: 'relative', overflow: 'hidden' }}>
-        {imgSrc ? (
-          <img src={imgSrc} alt={title} className="story-img cursor-pointer" onClick={onClick} />
+      {/* Image Container with Aspect Ratio and Overlay */}
+      <div className="story-card__image-container">
+        {imgSrc && !imageError ? (
+          <>
+            {/* Skeleton loader while image loads */}
+            {!imageLoaded && (
+              <div className="story-card__image-skeleton" aria-hidden="true">
+                <div className="story-card__image-skeleton-pulse" />
+              </div>
+            )}
+            <img
+              src={imgSrc}
+              alt={title}
+              className="story-card__image"
+              onClick={onClick}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                setImageError(true);
+                setImageLoaded(true);
+              }}
+              style={{ opacity: imageLoaded ? 1 : 0 }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onClick?.();
+                }
+              }}
+              aria-label={`View full story: ${title}`}
+            />
+            {/* Subtle overlay for better text readability on hover */}
+            <div className="story-card__image-overlay" aria-hidden="true" />
+          </>
         ) : (
-          <div
-            className="story-img"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(245, 158, 11, 0.06) 100%)',
-              color: 'var(--text-light)',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            No image
+          <div className="story-card__image-placeholder" role="img" aria-label="No image available">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+            <span>No image</span>
           </div>
         )}
       </div>
 
-      <div className="story-content">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <h6 className="story-title">{title}</h6>
-            <span className="text-xs" style={{ color: 'var(--text-light)', fontWeight: '500' }}>
-              {date ? moment(date).format('MMMM Do, YYYY') : '-'}
-            </span>
+      {/* Card Content */}
+      <div className="story-card__content">
+        <div className="story-card__header">
+          <div className="story-card__title-section">
+            <h3 className="story-card__title">{title}</h3>
+            <time
+              className="story-card__date"
+              dateTime={date ? moment(date).format('YYYY-MM-DD') : undefined}
+            >
+              {date ? moment(date).format('MMMM Do, YYYY') : 'Date not set'}
+            </time>
           </div>
 
+          {/* Enhanced Pin Button with better affordance */}
           <button
-            className="icon-btn"
+            className={`story-card__pin-btn ${isFavourite ? 'story-card__pin-btn--active' : ''}`}
             onClick={onPinNote}
-            style={{
-              background: isFavourite ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-              marginLeft: '0.5rem',
-            }}
+            aria-label={isFavourite ? 'Unpin this story' : 'Pin this story'}
+            aria-pressed={isFavourite}
+            title={isFavourite ? 'Unpin story' : 'Pin story'}
           >
-            <MdPushPin
-              className="text-xl"
-              style={{
-                color: isFavourite ? 'var(--secondary)' : 'var(--text-lighter)',
-                transition: 'all 0.2s',
-              }}
-            />
+            <MdPushPin className="story-card__pin-icon" aria-hidden="true" />
           </button>
         </div>
 
-        <p className="story-desc">{story}</p>
+        <p className="story-card__description">{story}</p>
 
-        <div className="story-footer">
-          <div
-            className="flex items-center gap-2"
-            style={{
-              fontSize: '0.8125rem',
-              color: 'var(--text-light)',
-              fontWeight: '500',
-            }}
-          >
-            <GrMapLocation className="text-base" style={{ color: 'var(--primary)' }} />
-            <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {/* Footer with Location and Actions */}
+        <div className="story-card__footer">
+          <div className="story-card__location" title={visitedLocation?.join(', ') || 'No location'}>
+            <GrMapLocation className="story-card__location-icon" aria-hidden="true" />
+            <span className="story-card__location-text">
               {visitedLocation && visitedLocation.length > 0
                 ? visitedLocation.map((item, index) =>
                     visitedLocation.length === index + 1 ? `${item}` : `${item}, `
@@ -145,17 +158,28 @@ const StoryCard = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button className="icon-btn" onClick={onEdit} style={{ color: 'var(--text-light)' }} title="Edit Story">
-              <MdCreate className="text-xl hover:text-primary" style={{ transition: 'color 0.2s' }} />
+          {/* Action Buttons with Enhanced Accessibility */}
+          <div className="story-card__actions" role="group" aria-label="Story actions">
+            <button
+              className="story-card__action-btn story-card__action-btn--edit"
+              onClick={onEdit}
+              aria-label={`Edit ${title}`}
+              title="Edit story"
+            >
+              <MdCreate className="story-card__action-icon" aria-hidden="true" />
             </button>
-            <button className="icon-btn" onClick={onDelete} style={{ color: 'var(--text-light)' }} title="Delete Story">
-              <MdDelete className="text-xl hover:text-error" style={{ transition: 'color 0.2s' }} />
+            <button
+              className="story-card__action-btn story-card__action-btn--delete"
+              onClick={onDelete}
+              aria-label={`Delete ${title}`}
+              title="Delete story"
+            >
+              <MdDelete className="story-card__action-icon" aria-hidden="true" />
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 
