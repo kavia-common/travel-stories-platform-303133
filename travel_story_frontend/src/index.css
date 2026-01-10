@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import './styles/typography.css';
 
 :root {
   /* Ocean Professional Theme */
@@ -26,14 +27,6 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
   
   /* Border Radius */
   --radius-sm: 0.375rem;
@@ -64,6 +57,8 @@ body {
   background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, var(--background) 100%);
   color: var(--text-main);
   min-height: 100vh;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 
 code {
@@ -71,65 +66,18 @@ code {
 }
 
 /* ============================================
-   TYPOGRAPHY SYSTEM
-   ============================================ */
-
-.text-xs { 
-  font-size: 0.75rem; 
-  line-height: 1rem; 
-}
-
-.text-sm { 
-  font-size: 0.875rem; 
-  line-height: 1.25rem; 
-}
-
-.text-base { 
-  font-size: 1rem; 
-  line-height: 1.5rem; 
-}
-
-.text-lg { 
-  font-size: 1.125rem; 
-  line-height: 1.75rem; 
-}
-
-.text-xl { 
-  font-size: 1.25rem; 
-  line-height: 1.75rem; 
-  font-weight: 600; 
-}
-
-.text-2xl { 
-  font-size: 1.5rem; 
-  line-height: 2rem; 
-  font-weight: 600; 
-}
-
-.text-3xl { 
-  font-size: 1.875rem; 
-  line-height: 2.25rem; 
-  font-weight: 700; 
-}
-
-.text-4xl { 
-  font-size: 2.25rem; 
-  line-height: 2.5rem; 
-  font-weight: 700; 
-}
-
-/* ============================================
    BUTTON SYSTEM
+   Using spacing tokens for padding
    ============================================ */
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: var(--spacing-3) var(--spacing-6);
   border-radius: var(--radius-lg);
   border: none;
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-caption);
   cursor: pointer;
   transition: transform var(--transition-base), box-shadow var(--transition-base),
     filter var(--transition-base), opacity var(--transition-base);
@@ -143,7 +91,6 @@ code {
 }
 
 .btn-primary::before {
-  /* Gradient sheen sweep */
   content: '';
   position: absolute;
   inset: -2px;
@@ -156,7 +103,6 @@ code {
 }
 
 .btn-primary::after {
-  /* Soft top highlight */
   content: '';
   position: absolute;
   inset: 0;
@@ -194,10 +140,10 @@ code {
   background-color: transparent;
   color: var(--primary);
   border: 2px solid var(--primary);
-  padding: 0.625rem 1.25rem;
+  padding: calc(var(--spacing-3) - 2px) calc(var(--spacing-5) - 2px);
   border-radius: var(--radius-lg);
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-caption);
   cursor: pointer;
   transition: all var(--transition-base);
   position: relative;
@@ -230,10 +176,10 @@ code {
 .btn-secondary {
   background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: var(--spacing-3) var(--spacing-6);
   border-radius: var(--radius-lg);
   border: none;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-md);
@@ -246,19 +192,21 @@ code {
 
 /* ============================================
    INPUT SYSTEM
+   Using spacing tokens for padding
    ============================================ */
 
 .input-box {
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: var(--spacing-3) var(--spacing-4);
   border: 2px solid var(--border);
   border-radius: var(--radius-lg);
-  font-size: 0.875rem;
+  font-size: var(--font-size-caption);
   outline: none;
   transition: all var(--transition-base);
   background: var(--surface);
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
+  font-weight: var(--font-weight-medium);
 }
 
 .input-box:focus {
@@ -282,12 +230,12 @@ code {
 
 .input-label {
   display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
   color: var(--text-light);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  letter-spacing: var(--letter-spacing-label);
+  margin-bottom: var(--spacing-2);
 }
 
 /* ============================================
@@ -298,7 +246,7 @@ code {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: var(--spacing-2);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   display: inline-flex;
@@ -333,53 +281,12 @@ code {
 .flex-1 { flex: 1; }
 .flex-wrap { flex-wrap: wrap; }
 
-.gap-1 { gap: 0.25rem; }
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
-.gap-8 { gap: 2rem; }
-
 .w-full { width: 100%; }
 .w-1\/2 { width: 50%; }
 .w-2\/3 { width: 66.666667%; }
 .h-screen { height: 100vh; }
 .h-full { height: 100%; }
 .min-h-screen { min-height: 100vh; }
-
-.p-2 { padding: 0.5rem; }
-.p-3 { padding: 0.75rem; }
-.p-4 { padding: 1rem; }
-.p-5 { padding: 1.25rem; }
-.p-6 { padding: 1.5rem; }
-.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
-
-.m-auto { margin: auto; }
-.mx-auto { margin-left: auto; margin-right: auto; }
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 0.75rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-5 { margin-top: 1.25rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mt-8 { margin-top: 2rem; }
-.mt-20 { margin-top: 5rem; }
-.mb-1 { margin-bottom: 0.25rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mr-3 { margin-right: 0.75rem; }
-.my-3 { margin-top: 0.75rem; margin-bottom: 0.75rem; }
-
-.pt-3 { padding-top: 0.75rem; }
-.pt-4 { padding-top: 1rem; }
-.pb-1 { padding-bottom: 0.25rem; }
 
 .bg-white { background-color: var(--surface); }
 .bg-slate-50 { background-color: #f8fafc; }
@@ -396,10 +303,6 @@ code {
 .text-primary { color: var(--primary); }
 .text-black { color: #000; }
 .text-white { color: #fff; }
-
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
 
 .underline { text-decoration: underline; }
 .uppercase { text-transform: uppercase; }
@@ -436,10 +339,10 @@ code {
 .sticky { position: sticky; }
 
 .top-0 { top: 0; }
-.top-2 { top: 0.5rem; }
-.right-2 { right: 0.5rem; }
-.right-10 { right: 2.5rem; }
-.bottom-10 { bottom: 2.5rem; }
+.top-2 { top: var(--spacing-2); }
+.right-2 { right: var(--spacing-2); }
+.right-10 { right: var(--spacing-10); }
+.bottom-10 { bottom: var(--spacing-10); }
 .left-0 { left: 0; }
 
 .z-50 { z-index: 50; }
@@ -447,8 +350,6 @@ code {
 .z-999 { z-index: 999; }
 
 .object-cover { object-fit: cover; }
-
-.leading-7 { line-height: 1.75rem; }
 
 .grid { display: grid; }
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
@@ -459,8 +360,8 @@ code {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
 }
 
 @media (min-width: 640px) {
